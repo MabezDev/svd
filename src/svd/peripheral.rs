@@ -148,7 +148,14 @@ impl PeripheralBuilder {
 impl Peripheral {
     fn validate(self) -> Result<Self> {
         // TODO
-        check_name(&self.name)?;
+        check_name(&self.name, "name")?;
+        if let Some(name) = self.derived_from.as_ref() {
+            check_name(name, "derivedFrom")?;
+        } else if let Some(registers) = self.registers.as_ref() {
+            if registers.is_empty() {
+                return Err(PeripheralError::EmptyRegisters)?;
+            }
+        }
         Ok(self)
     }
 }

@@ -42,9 +42,10 @@ impl Parse for BitRange {
         let (end, start, range_type): (u32, u32, BitRangeType) = if let Some(range) =
             tree.get_child("bitRange")
         {
-            let text = range.text.as_ref().ok_or_else(|| anyhow!("text missing"))?; // TODO: Make into a proper error, text empty or something similar
-                                                                                    // TODO: If the `InvalidBitRange` enum was an error we could context into here somehow so that
-                                                                                    // the output would be similar to the parse error
+            let text = range
+                .text
+                .as_ref()
+                .ok_or_else(|| BitRangeError::Invalid(tree.clone(), InvalidBitRange::Empty))?;
             if !text.starts_with('[') {
                 return Err(BitRangeError::Invalid(tree.clone(), InvalidBitRange::Syntax).into());
                 // TODO: Maybe have a MissingOpen/MissingClosing variant

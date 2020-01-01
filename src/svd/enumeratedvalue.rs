@@ -86,7 +86,7 @@ impl EnumeratedValueBuilder {
 
 impl EnumeratedValue {
     fn validate(self) -> Result<Self> {
-        check_name(&self.name)?;
+        check_name(&self.name, "name")?;
         match (&self.value, &self.is_default) {
             (Some(_), None) | (None, Some(_)) => Ok(self),
             _ => Err(EnumeratedValueError::AbsentValue(self.value, self.is_default).into()),

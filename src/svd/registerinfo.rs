@@ -165,21 +165,19 @@ impl RegisterInfoBuilder {
 
 impl RegisterInfo {
     fn validate(self) -> Result<Self> {
-        check_name(&self.name)?;
+        check_name(&self.name, "name")?;
         if let Some(name) = self.alternate_group.as_ref() {
-            check_name(name)?;
+            check_name(name, "alternateGroup")?;
         }
         if let Some(name) = self.alternate_register.as_ref() {
-            check_name(name)?;
+            check_name(name, "alternateRegister")?;
         }
         if let Some(name) = self.derived_from.as_ref() {
-            check_name(name)?;
+            check_name(name, "derivedFrom")?;
         } else if let Some(fields) = self.fields.as_ref() {
             if fields.is_empty() {
-                return Err(anyhow!("Empty `fields` tag"));
+                return Err(RegisterError::EmptyFields)?;
             }
-        } else {
-            return Err(anyhow!("Register not derived and `fields` tag is absent"));
         }
         Ok(self)
     }

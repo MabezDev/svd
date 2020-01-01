@@ -108,14 +108,12 @@ impl ClusterInfoBuilder {
 
 impl ClusterInfo {
     fn validate(self) -> Result<Self> {
-        check_name(&self.name)?;
+        check_name(&self.name, "name")?;
         if let Some(name) = self.derived_from.as_ref() {
-            check_name(name)?;
+            check_name(name, "derivedFrom")?;
         } else {
             if self.children.is_empty() {
-                return Err(anyhow!(
-                    "Cluster must contain at least one Register or Cluster"
-                ));
+                return Err(ClusterError::Empty)?;
             }
         }
         Ok(self)

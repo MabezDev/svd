@@ -120,9 +120,9 @@ impl FieldInfoBuilder {
 
 impl FieldInfo {
     fn validate(self) -> Result<Self> {
-        check_name(&self.name)?;
+        check_name(&self.name, "name")?;
         if let Some(name) = self.derived_from.as_ref() {
-            check_name(name)?;
+            check_name(name, "derivedFrom")?;
         }
         for ev in &self.enumerated_values {
             ev.check_range(0..2_u32.pow(self.bit_range.width))?;

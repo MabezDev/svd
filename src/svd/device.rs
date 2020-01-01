@@ -127,10 +127,7 @@ impl Device {
     fn validate(self) -> Result<Self> {
         // TODO
         if self.peripherals.is_empty() {
-            return Err(anyhow!(
-                "Device {} must contain at least one peripheral",
-                self.name
-            ));
+            return Err(DeviceError::Empty)?;
         }
         Ok(self)
     }
@@ -140,10 +137,20 @@ impl Parse for Device {
     type Object = Self;
     type Error = anyhow::Error;
 
-    /// Parses a SVD file
     fn parse(tree: &Element) -> Result<Self> {
+        if tree.name != "device" {
+            return Err(ParseError::NotExpectedTag(tree.clone(), "device".to_string()).into());
+        }
+        let name = tree.get_child_text("name")?;
+        Self::_parse(tree, name.clone()).with_context(|| format!("In device `{}`", name))
+    }
+}
+
+impl Device {
+    /// Parses a SVD file
+    fn _parse(tree: &Element, name: String) -> Result<Self> {
         DeviceBuilder::default()
-            .name(tree.get_child_text("name")?)
+            .name(name)
             .schema_version(tree.attributes.get("schemaVersion").cloned())
             .cpu(parse::optional::<Cpu>("cpu", tree)?)
             .version(tree.get_child_text_opt("version")?)
